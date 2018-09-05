@@ -63,11 +63,30 @@ function OMautoClose(outcome : any, xhr : any, request: any)
 
 function OMautoOpen(outcome : any, xhr : any, request: any)
 {
-    var targetUri = request.mapElementInvokeRequest.pageRequest.pageComponentInputResponses[0].contentValue;
-    var componentId = request.mapElementInvokeRequest.pageRequest.pageComponentInputResponses[0].pageComponentId;
+    //the outcome's .pageObjectBindingId tells us which component triggered the outcome and inserted the data
+    var triggerComponent=outcome.pageObjectBindingId;
 
-    var wnd = window.open(targetUri, "_blank");
-    return;
+    //get the response for the correct component
+    var response : any;
+    for(var pos = 0 ; pos < request.mapElementInvokeRequest.pageRequest.pageComponentInputResponses.length ; pos++)
+    {
+        var item = request.mapElementInvokeRequest.pageRequest.pageComponentInputResponses[pos];
+        if(item.pageComponentId === triggerComponent)
+        {
+            response = item;
+            break;
+        }
+    }
+
+    if(response)
+    {
+        var targetUri = response.contentValue;
+        var wnd = window.open(targetUri, "_blank");
+    }
+    else
+    {
+        alert("failed to get uri - pageObjectBindingId not found in pageComponentInputResponses");
+    }
 }
 
 function OMforcePrint(outcome : any, xhr : any, request: any)
