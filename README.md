@@ -10,7 +10,7 @@ There are two OOB functions for AutoClose and ForcePrint.
 
 ## Setup
 
-- Upload the js file as an asset to your tenant.
+- Grab the js file from the /dist folder and upload it as an asset to your tenant.
 
 - Add the file to your player code like this: -
 
