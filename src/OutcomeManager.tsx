@@ -117,13 +117,22 @@ function OMdoneHandler(xhr: any , request: any)
 //this saves the last selected outcome in the OutcomeManager           
 function OMbeforeSendHandler(xhr: any, request: any )
 {
-    manywho.OutcomeManager.originalRequest  = request;
-    manywho.OutcomeManager.stateId = request.stateId;
-    var outcomeId = request.mapElementInvokeRequest.selectedOutcomeId;
-    if(manywho.OutcomeManager.tenantId && manywho.OutcomeManager.stateId && outcomeId )
+    if(request)
     {
-        var flowKey = manywho.OutcomeManager.tenantId + "___" + manywho.OutcomeManager.stateId;
-        manywho.OutcomeManager.selectedOutcome = manywho.model.getOutcome( outcomeId  ,  flowKey );
+        manywho.OutcomeManager.originalRequest  = request;
+        manywho.OutcomeManager.stateId = request.stateId;
+        var outcomeId = request.mapElementInvokeRequest.selectedOutcomeId;
+        if(manywho.OutcomeManager.tenantId && manywho.OutcomeManager.stateId && outcomeId )
+        {
+            var flowKey = manywho.OutcomeManager.tenantId + "___" + manywho.OutcomeManager.stateId;
+            manywho.OutcomeManager.selectedOutcome = manywho.model.getOutcome( outcomeId  ,  flowKey );
+        }
+    }
+    else
+    {
+        manywho.OutcomeManager.originalRequest  = null;
+        manywho.OutcomeManager.stateId = "";
+        manywho.OutcomeManager.selectedOutcome = null;
     }
 }
 
