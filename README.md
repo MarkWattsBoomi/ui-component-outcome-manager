@@ -6,7 +6,15 @@ You add an attribute to the outcome e.g. MyOutcomeAction and set it to true to h
 
 You then need to create a function to handle the event and register it in the player.
 
-There are two OOB functions for AutoClose and ForcePrint.
+There are four OOB functions for AutoClose, AutoOpen, AutoNav and ForcePrint.
+
+- AutoClose will close the user's browser tab containing the flow.  Add an attribute to the outcome with the name 'AutoClose' and set its value to 'true'.
+
+- AutoOpen will open a specific url in a new tab.  Add an attribute to the outcome with the name 'AutoOpen' and set its value to 'true' and a second attribute called 'AutoOpenUrl' with its value containing the desired Uri e.g. 'http://www.google.com'
+
+- AutoNav will open a specific url in the current tab effectively taking the user to a specific page.  Add an attribute to the outcome with the name 'AutoNav' and set its value to 'true' and a second attribute called 'AutoNavUrl' with its value containing the desired Uri e.g. 'http://www.google.com'.
+
+- ForcePrint will trigger the browser's print page function and show the user the print dialog.  Add an attribute to the outcome with the name 'ForcePrint' and set its value to 'true'.
 
 ## Setup
 

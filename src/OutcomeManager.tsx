@@ -23,6 +23,7 @@ manywho.OutcomeManager.originalRequest;
 manywho.OutcomeManager.handlers = {};
 manywho.OutcomeManager.handlers["AutoClose"] = OMautoClose;
 manywho.OutcomeManager.handlers["AutoOpen"] = OMautoOpen;
+manywho.OutcomeManager.handlers["AutoNav"] = OMautoNav;
 manywho.OutcomeManager.handlers["ForcePrint"] = OMforcePrint;
 
 
@@ -61,8 +62,37 @@ function OMautoClose(outcome : any, xhr : any, request: any)
     return;
 }
 
+function OMautoNav(outcome : any, xhr : any, request: any)
+{
+    var targetUrl = outcome.attributes.AutoNavUrl || "";
+
+    if(targetUrl && targetUrl.length > 0)
+    {
+        var wnd = window.open(targetUrl, "_self");
+    }
+    else
+    {
+        alert("No AutoNavUrl specified in the outcome's attributes");
+    }
+}
+
+
+
 function OMautoOpen(outcome : any, xhr : any, request: any)
 {
+
+    var targetUrl = outcome.attributes.AutoOpenUrl || "";
+
+    if(targetUrl && targetUrl.length > 0)
+    {
+        var wnd = window.open(targetUrl, "_blank");
+    }
+    else
+    {
+        alert("No AutoOpenUrl specified in the outcome's attributes");
+    }
+
+    /*
     //the outcome's .pageObjectBindingId tells us which component triggered the outcome and inserted the data
     var triggerComponent=outcome.pageObjectBindingId;
 
@@ -87,6 +117,7 @@ function OMautoOpen(outcome : any, xhr : any, request: any)
     {
         alert("failed to get uri - pageObjectBindingId not found in pageComponentInputResponses");
     }
+    */
 }
 
 function OMforcePrint(outcome : any, xhr : any, request: any)
