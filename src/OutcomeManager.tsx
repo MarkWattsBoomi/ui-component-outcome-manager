@@ -16,6 +16,8 @@ if (!tenantId)
 }
     
 
+
+
 //declare global { interface Window {OutcomeManager: any;}}
 manywho.OutcomeManager = {};
 manywho.OutcomeManager.tenantId  = tenantId;
@@ -33,28 +35,48 @@ for(var key in manywho.OutcomeHandlers)
 }
     
 // this attaches the Ajax handlers to the manywho.CustomComponentOrchestrator or 
-// initialize function if manywho.CustomComponentOrchestrator isnt defined.  
-if(manywho.CustomComponentOrchestrator)
-{
-    manywho.CustomComponentOrchestrator.onBeforeSendHandlers.push(OMbeforeSendHandler);
-    manywho.CustomComponentOrchestrator.doneSendHandlers.push(OMdoneHandler);
-}
-else
-{
-    manywho.settings.initialize(
-        {
-        }
-        ,
-        {
-            invoke: 
-            {
-                beforeSend: OMbeforeSendHandler,
-                done: OMdoneHandler                
-            }
-        }
-    );
+// initialize function if manywho.CustomComponentOrchestrator isnt defined. 
+if (!(manywho as any).eventManager) {
+    (manywho as any).eventManager = {};
+    (manywho as any).eventManager.beforeSendListeners = [];
+    (manywho as any).eventManager.doneListeners = [];
+    (manywho as any).eventManager.failListeners = [];
+
+    (manywho as any).eventManager.beforeSend = (xhr: XMLHttpRequest, request: any) => {
+        (manywho as any).eventManager.beforeSendListeners.forEach((listener: any) => listener(xhr, request));
+    };
+
+    (manywho as any).eventManager.done = (xhr: XMLHttpRequest, request: any) => {
+        (manywho as any).eventManager.doneListeners.forEach((listener: any) => listener(xhr, request));
+    };
+
+    (manywho as any).eventManager.fail = (xhr: XMLHttpRequest, request: any) => {
+        (manywho as any).eventManager.failListeners.forEach((listener: any) => listener(xhr, request));
+    };
+
+    (manywho as any).eventManager.addBeforeSendListener = (handler: (xhr: XMLHttpRequest, request: any) => void) => {
+        (manywho as any).eventManager.beforeSendListeners.push(handler);
+    };
+
+    (manywho as any).eventManager.addDoneListener = (handler: (xhr: XMLHttpRequest, request: any) => void) => {
+        (manywho as any).eventManager.doneListeners.push(handler);
+    };
+
+    (manywho as any).eventManager.addFailListener = (handler: (xhr: XMLHttpRequest, request: any) => void) => {
+        (manywho as any).eventManager.failListeners.push(handler);
+    };
+
+    manywho.settings.initialize(null, {
+        invoke: {
+            beforeSend: (manywho as any).eventManager.beforeSend,
+            done: (manywho as any).eventManager.done,
+            fail: (manywho as any).eventManager.fail,
+        },
+    });
 }
 
+manywho.eventManager.addBeforeSendListener(OMbeforeSendHandler);
+manywho.eventManager.addDoneListener(OMdoneHandler);
 
 function OMautoClose(outcome : any, xhr : any, request: any)
 {
