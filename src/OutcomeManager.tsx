@@ -10,18 +10,19 @@ let currentMapElement: string;
 let tenantId: string;
 */
 
-let handlers: {[key: string] : any} = [];
-handlers["AutoOpen"] = OMautoOpen;
-handlers["AutoNav"] = OMautoNav;
-handlers["AutoClose"] = OMautoClose;
-handlers["AutoPrint"] = OMAutoPrint;
+manywho.OutcomeManager = {};
+manywho.OutcomeManager.handlers = {};
+manywho.OutcomeManager.handlers["AutoOpen"] = OMautoOpen;
+manywho.OutcomeManager.handlers["AutoNav"] = OMautoNav;
+manywho.OutcomeManager.handlers["AutoClose"] = OMautoClose;
+manywho.OutcomeManager.handlers["AutoPrint"] = OMAutoPrint;
 
 
 manywho.eventManager.addBeforeSendListener(OMbeforeSendHandler,"outcome-manager");
 //manywho.eventManager.addDoneListener(OMdoneHandler, "outcome-manager");
 
 //this saves the last selected outcome in the OutcomeManager           
-function OMbeforeSendHandler(xhr: any, request: any )
+async function OMbeforeSendHandler(xhr: any, request: any )
 {
     if(request)
     {
@@ -42,11 +43,17 @@ function OMbeforeSendHandler(xhr: any, request: any )
             if(message.outcome) {
                 let attributes: {[name: string]: string} = message.outcome.attributes;
                 if(attributes) {
-                    Object.keys(attributes).forEach((attributeName: string) => {
-                        if(handlers[attributeName] && attributes[attributeName].trim().toLowerCase() === "true") {
-                            handlers[attributeName](message, xhr, request); 
+                    Object.keys(attributes).forEach(async (attributeName: string) => {
+                        if(attributeName !== "AutoClose") {
+                            if(manywho.OutcomeManager.handlers[attributeName] && attributes[attributeName].trim().toLowerCase() === "true") {
+                                manywho.OutcomeManager.handlers[attributeName](message, xhr, request); 
+                            }
                         }
                     });
+                    //finally do auto-close
+                    if(attributes["AutoClose"] && attributes["AutoClose"].trim().toLowerCase() === "true") {
+                        await manywho.OutcomeManager.handlers["AutoClose"](message, xhr, request); 
+                    }
                 }
             }
         }
@@ -75,10 +82,10 @@ function OMdoneHandler(xhr: any , request: any)
 */
 
 
-function OMautoClose(message : any, xhr : any, request: any)
+async function OMautoClose(message : any, xhr : any, request: any)
 {
     window.close();
-    return;
+    return Promise.resolve();
 }
 
 async function OMautoNav(message : any, xhr : any, request: any)
@@ -94,6 +101,7 @@ async function OMautoNav(message : any, xhr : any, request: any)
     {
         alert("No AutoNavUrl specified in the outcome's attributes");
     }
+    return Promise.resolve();
 }
 
 
@@ -105,7 +113,7 @@ async function OMautoOpen(message: any, xhr : any, request: any)
 
     if(targetUrl && targetUrl.length > 0)
     {
-        var url = await getValue(message, targetUrl)
+        var url =  await getValue(message, targetUrl)
         var wnd = window.open(url, "_blank");
     }
     else
@@ -113,12 +121,14 @@ async function OMautoOpen(message: any, xhr : any, request: any)
         alert("No AutoOpenUrl specified in the outcome's attributes");
     }
 
+    return Promise.resolve();
+
 }
 
 function OMAutoPrint(message : any, xhr : any, request: any)
 {
     window.print();
-    return;
+    return Promise.resolve();
 }
     
 
